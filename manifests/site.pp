@@ -10,6 +10,7 @@ define nginx::site($domain,
                    $rewrite_missing_html_extension=false,
                    $upstreams=[],
                    $aliases=[],
+                   $bind_ip="",
                    $ssl=false,
                    $ssl_certificate="",
                    $ssl_certificate_key="") {
