@@ -22,6 +22,14 @@ upstream <%= name %> {
 }
 <% end %>
 
+<% unless hippie_upstreams.empty? %>
+upstream <%= name %>_hippie {
+  <% hippie_upstreams.each do |upstream| %>
+  server <%= upstream %> fail_timeout=0;
+  <% end %>
+}
+<% end %>
+
 server {
   listen <% unless bind_ip.empty? %><%= bind_ip %>:<% end %><% if ssl %>443<% else %>80<% end %><% if default_vhost %> default deferred<% end %>;
   client_max_body_size 4G;
@@ -53,7 +61,6 @@ server {
   <% end %>
 
   location / {
-
     <% unless upstreams.empty? %>
     try_files $uri @<%= name %>;
     <% else %>
@@ -75,6 +82,22 @@ server {
     proxy_redirect off;
 
     proxy_pass http://<%= name %>;
+  }
+  <% end %>
+
+  <% unless hippie_upstreams.empty? %>
+  location /_hippie {
+      try_files $uri @<%= name %>_hippie;
+  }
+  
+  location @<%= name %>_hippie {
+    proxy_send_timeout 40;
+    proxy_read_timeout 40;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header Host $http_host;
+    proxy_redirect off;
+
+    proxy_pass http://<%= name %>_hippie;
   }
   <% end %>
 }

@@ -11,6 +11,7 @@ define nginx::site($domain,
                    $upstreams=[],
                    $aliases=[],
                    $bind_ip="",
+                   $hippie_upstreams=[],
                    $ssl=false,
                    $ssl_certificate="",
                    $ssl_certificate_key="") {
